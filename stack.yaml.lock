@@ -3,10 +3,17 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: slack-web-0.2.0.11@sha256:c42cb6654cbde5761234dca7dbf6ad6784dfdafb556d2b4400f8c3602c03b791,2103
+    pantry-tree:
+      size: 1136
+      sha256: 343ea32a6b6610a7f92c73150215f26fe1243b57165458f80297e481e1a47f6d
+  original:
+    hackage: slack-web-0.2.0.11
 snapshots:
 - completed:
-    size: 494635
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/15/12.yaml
-    sha256: a71c4293d8f461f455ff0d9815dfe4ab2f1adacd7e0bbc9a218f46ced8c4929a
-  original: lts-15.12
+    size: 524996
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/14/27.yaml
+    sha256: 7ea31a280c56bf36ff591a7397cc384d0dff622e7f9e4225b47d8980f019a0f0
+  original: lts-14.27

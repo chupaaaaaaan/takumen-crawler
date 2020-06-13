@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 64bd6456e9f1dfc51465ed4e4e9ba3622fffb9d26ab318a913b1cdfcafb2fa8a
+-- hash: e5de4fa56e4c461ee80bc8492abacd6507134c4f6f27184ec19aa7564d83a5b4
 
 name:           takumen-crawler
 version:        0.1.0.0
@@ -31,18 +31,22 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , containers
     , http-client
     , http-client-tls
     , mtl
+    , mwc-random
     , scalpel
+    , slack-web
     , tagsoup
     , text
-    , text-icu
     , transformers
+    , unix
   default-language: Haskell2010
 
-executable takumen-crawler-exe
+executable takumen
   main-is: Main.hs
   other-modules:
       Paths_takumen_crawler
@@ -50,16 +54,20 @@ executable takumen-crawler-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , containers
     , http-client
     , http-client-tls
     , mtl
+    , mwc-random
     , scalpel
+    , slack-web
     , tagsoup
     , takumen-crawler
     , text
-    , text-icu
     , transformers
+    , unix
   default-language: Haskell2010
 
 test-suite takumen-crawler-test
@@ -71,14 +79,18 @@ test-suite takumen-crawler-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , containers
     , http-client
     , http-client-tls
     , mtl
+    , mwc-random
     , scalpel
+    , slack-web
     , tagsoup
     , takumen-crawler
     , text
-    , text-icu
     , transformers
+    , unix
   default-language: Haskell2010

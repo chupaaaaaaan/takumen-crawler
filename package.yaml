@@ -21,20 +21,24 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- aeson
+- containers
 - text
-- text-icu
 - mtl
 - transformers
 - tagsoup
 - scalpel
 - http-client
 - http-client-tls
+- slack-web
+- mwc-random
+- unix
 
 library:
   source-dirs: src
 
 executables:
-  takumen-crawler-exe:
+  takumen:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
