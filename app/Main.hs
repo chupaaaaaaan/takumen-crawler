@@ -36,6 +36,7 @@ instance FromJSON ItemState
 
 data Item = Item { name        :: Name
                  , link        :: Link
+                 , imgLink     :: Link
                  , description :: Description
                  , price       :: Price
                  , itemState   :: ItemState
@@ -64,16 +65,22 @@ scrapeItem :: Scraper Text Item
 scrapeItem = do
   n <- scrapeName
   l <- scrapeLink
+  i <- scrapeImgLink
   d <- scrapeDesc
   p <- scrapePrice
   s <- scrapeItemState
-  return $ Item n l d p s
+  return $ Item n l i d p s
 
 scrapeName :: Scraper Text Name
 scrapeName = text $ "div" @: [hasClass "textBox"]  // "p" @: [hasClass "pLink"] // "a"
 
 scrapeLink :: Scraper Text Link
 scrapeLink = attr "href" $ "div" @: [hasClass "textBox"]  // "p" @: [hasClass "pLink"] // "a"
+
+scrapeImgLink :: Scraper Text Link
+scrapeImgLink = do
+  i <- attr "src" $ "div" @: [hasClass "photoBox"]  // "img"
+  return $ "https:" <> i
 
 scrapeDesc :: Scraper Text Description
 scrapeDesc = do
@@ -117,8 +124,6 @@ newtype App a = App (ReaderT Env IO a)
 runApp :: Env -> App a -> IO a
 runApp env (App m) = runReaderT m env
 
-
-
 postAvailableTakumen :: [Item] -> App ()
 postAvailableTakumen is = do
   storeRef <- asks store
@@ -132,7 +137,7 @@ postAvailableTakumen is = do
                     Nothing -> Just item
                     Just oi -> if itemState oi == SoldOut then Just item else Nothing
 
-  let msg = map ((\i -> name i <> "\n" <> baseUrl urls <> link i) . fromJust) . filter (/=Nothing) $ igo
+  let msg = map ((\i -> name i <> "\n" <> baseUrl urls <> link i <> "\n" <> imgLink i) . fromJust) . filter (/=Nothing) $ igo
 
   forM_ msg $ \m -> Slack.chatPostMessage $ Slack.mkPostMsgReq channel m
 
