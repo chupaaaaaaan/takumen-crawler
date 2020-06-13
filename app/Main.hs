@@ -132,9 +132,9 @@ postAvailableTakumen is = do
                     Nothing -> Just item
                     Just oi -> if itemState oi == SoldOut then Just item else Nothing
 
-  let msg = foldMap ((\i -> name i <> "\n" <> baseUrl urls <> link i <> "\n\n") . fromJust) . filter (/=Nothing) $ igo
-      request = Slack.mkPostMsgReq channel msg
-  Slack.chatPostMessage request
+  let msg = map ((\i -> name i <> "\n" <> baseUrl urls <> link i) . fromJust) . filter (/=Nothing) $ igo
+
+  forM_ msg $ \m -> Slack.chatPostMessage $ Slack.mkPostMsgReq channel m
 
   liftIO $ writeIORef storeRef $ M.fromList $ map (\i -> (link i, i)) is
 
