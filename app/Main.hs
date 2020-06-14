@@ -134,18 +134,11 @@ postItemMessages is = do
 
 listChangedTakumen :: [Item] -> App [Item]
 listChangedTakumen is = do
-  storeRef <- asks store
-  oldMap   <- liftIO $ readIORef storeRef
+  oldMap <- asks store >>= liftIO . readIORef
   igo <- forM is $ \item ->
     return $ case M.lookup (link item) oldMap of
                Nothing -> Just item
                Just oi -> if itemState oi == itemState item then Just item else Nothing
-    -- return $ if itemState item == SoldOut
-    --          then Nothing
-    --          else case M.lookup (link item) oldMap of
-    --                 Nothing -> Just item
-    --                 Just oi -> if itemState oi == SoldOut then Just item else Nothing
-
   return $ map fromJust . filter (/=Nothing) $ igo
 
 app :: App ()
