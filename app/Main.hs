@@ -129,7 +129,7 @@ postItemMessages :: [Item] -> App ()
 postItemMessages is = do
   channel  <- asks slackTargetChannel
   urls     <- asks urlConfig
-  let msg = map (\i -> name i <> "is" <> (T.pack $ show $ itemState i) <> ".\n" <> baseUrl urls <> link i <> "\n" <> imgLink i) is
+  let msg = map (\i -> name i <> " is " <> (T.pack $ show $ itemState i) <> ".\n" <> baseUrl urls <> link i <> "\n" <> imgLink i) is
   forM_ msg $ \m -> Slack.chatPostMessage $ Slack.mkPostMsgReq channel m
 
 listChangedTakumen :: [Item] -> App [Item]
