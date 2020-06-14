@@ -24,7 +24,6 @@ import qualified Web.Slack as Slack
 import qualified Web.Slack.Chat as Slack
 import qualified Web.Slack.Common as Slack
 import System.Environment
-import System.Random.MWC
 
 type Name = Text
 type Link = Text
@@ -52,10 +51,7 @@ data UrlConfig = UrlConfig { baseUrl :: Text
 prettyPrint :: Maybe [Item] -> IO ()
 prettyPrint Nothing = T.putStrLn "No Content"
 prettyPrint (Just item) = forM_ item $ \Item{..} ->
-  case itemState of
-    SoldOut   -> T.putStrLn $ "{ " <> name <> "\n, " <> link <> "\n, " <> description <> "\n, " <> price <> "\n, " <> "SoldOut"   <> "\n} "
-    Available -> T.putStrLn $ "{ " <> name <> "\n, " <> link <> "\n, " <> description <> "\n, " <> price <> "\n, " <> "Available" <> "\n} "
-
+  T.putStrLn $ "{ " <> name <> "\n, " <> link <> "\n, " <> description <> "\n, " <> price <> "\n, " <> (T.pack $ show $ itemState) <> "\n} "
 
 -- scraper
 items :: Scraper Text [Item]
@@ -124,37 +120,47 @@ newtype App a = App (ReaderT Env IO a)
 runApp :: Env -> App a -> IO a
 runApp env (App m) = runReaderT m env
 
-postAvailableTakumen :: [Item] -> App ()
-postAvailableTakumen is = do
-  storeRef <- asks store
-  oldMap   <- liftIO $ readIORef storeRef
+updateStore :: [Item] -> App ()
+updateStore is = do
+  storeRef <- asks store  
+  liftIO $ writeIORef storeRef $ M.fromList $ map (\i -> (link i, i)) is
+
+postItemMessages :: [Item] -> App ()
+postItemMessages is = do
   channel  <- asks slackTargetChannel
   urls     <- asks urlConfig
-  igo <- forM is $ \item ->
-    return $ if itemState item == SoldOut
-             then Nothing
-             else case M.lookup (link item) oldMap of
-                    Nothing -> Just item
-                    Just oi -> if itemState oi == SoldOut then Just item else Nothing
-
-  let msg = map ((\i -> name i <> "\n" <> baseUrl urls <> link i <> "\n" <> imgLink i) . fromJust) . filter (/=Nothing) $ igo
-
+  let msg = map (\i -> name i <> "is" <> (T.pack $ show $ itemState i) <> ".\n" <> baseUrl urls <> link i <> "\n" <> imgLink i) is
   forM_ msg $ \m -> Slack.chatPostMessage $ Slack.mkPostMsgReq channel m
 
-  liftIO $ writeIORef storeRef $ M.fromList $ map (\i -> (link i, i)) is
+listChangedTakumen :: [Item] -> App [Item]
+listChangedTakumen is = do
+  storeRef <- asks store
+  oldMap   <- liftIO $ readIORef storeRef
+  igo <- forM is $ \item ->
+    return $ case M.lookup (link item) oldMap of
+               Nothing -> Just item
+               Just oi -> if itemState oi == itemState item then Just item else Nothing
+    -- return $ if itemState item == SoldOut
+    --          then Nothing
+    --          else case M.lookup (link item) oldMap of
+    --                 Nothing -> Just item
+    --                 Just oi -> if itemState oi == SoldOut then Just item else Nothing
+
+  return $ map fromJust . filter (/=Nothing) $ igo
 
 app :: App ()
 app = do
-  -- gen <- liftIO $ createSystemRandom
   urls <- asks urlConfig
   forever $ do
     scraped <- liftIO $ scrapeURLWithConfig (Config utf8Decoder Nothing) (T.unpack $ baseUrl urls <> searchUrl urls) items
 
-    liftIO $ prettyPrint scraped
+    -- liftIO $ prettyPrint scraped
 
     case scraped of
       Nothing -> error "結果の取得に失敗しました。"
-      Just result -> postAvailableTakumen result
+      Just result -> do
+        listChangedTakumen result >>= postItemMessages
+        updateStore result
 
     liftIO $ threadDelay (60 * 1000000)
 
