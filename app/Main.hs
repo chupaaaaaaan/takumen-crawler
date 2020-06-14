@@ -6,24 +6,24 @@
 
 module Main where
 
-import Network.HTTP.Client
-import Text.HTML.Scalpel
-import Data.Aeson
-import Data.Text (Text)
-import Data.Maybe
-import Data.IORef
+import           Control.Concurrent
+import           Control.Monad.Cont
+import           Control.Monad.Reader
+import           Data.Aeson
+import           Data.IORef
+import           Data.Map.Strict (Map)
+import qualified Data.Map.Strict as M
+import           Data.Maybe
+import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import Control.Monad.Reader
-import Control.Concurrent
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as M
-import GHC.Generics (Generic)
-import Control.Monad.Cont
+import           GHC.Generics (Generic)
+import           Network.HTTP.Client
+import           System.Environment
+import           Text.HTML.Scalpel
 import qualified Web.Slack as Slack
 import qualified Web.Slack.Chat as Slack
 import qualified Web.Slack.Common as Slack
-import System.Environment
 
 type Name = Text
 type Link = Text
