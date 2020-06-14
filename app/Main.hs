@@ -137,8 +137,8 @@ listChangedTakumen is = do
   oldMap <- asks store >>= liftIO . readIORef
   igo <- forM is $ \item ->
     return $ case M.lookup (link item) oldMap of
-               Nothing -> Just item
-               Just oi -> if itemState oi == itemState item then Just item else Nothing
+               Nothing -> if itemState item == Available    then Just item else Nothing
+               Just oi -> if itemState item == itemState oi then Just item else Nothing
   return $ map fromJust . filter (/=Nothing) $ igo
 
 app :: App ()
