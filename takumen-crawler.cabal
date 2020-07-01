@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e5de4fa56e4c461ee80bc8492abacd6507134c4f6f27184ec19aa7564d83a5b4
+-- hash: 0b2c271437cea3b4d80353ccb65482ca191b3987c336bad48927cf2a41e18027
 
 name:           takumen-crawler
 version:        0.1.0.0
@@ -26,6 +26,11 @@ source-repository head
   location: https://github.com/githubuser/takumen-crawler
 
 library
+  exposed-modules:
+      AppFrame
+      Data
+      Query
+      Scraper
   other-modules:
       Paths_takumen_crawler
   hs-source-dirs:
@@ -39,6 +44,7 @@ library
     , mtl
     , mwc-random
     , scalpel
+    , scalpel-core
     , slack-web
     , tagsoup
     , text
@@ -62,6 +68,7 @@ executable takumen
     , mtl
     , mwc-random
     , scalpel
+    , scalpel-core
     , slack-web
     , tagsoup
     , takumen-crawler
@@ -87,6 +94,7 @@ test-suite takumen-crawler-test
     , mtl
     , mwc-random
     , scalpel
+    , scalpel-core
     , slack-web
     , tagsoup
     , takumen-crawler

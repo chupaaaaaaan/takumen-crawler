@@ -28,6 +28,7 @@ dependencies:
 - transformers
 - tagsoup
 - scalpel
+- scalpel-core
 - http-client
 - http-client-tls
 - slack-web
